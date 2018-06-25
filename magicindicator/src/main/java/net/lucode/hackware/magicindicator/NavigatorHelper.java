@@ -25,22 +25,26 @@ public class NavigatorHelper {
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         float currentPositionOffsetSum = position + positionOffset;
         boolean leftToRight = false;
+        // 判断滑动方向
         if (mLastPositionOffsetSum <= currentPositionOffsetSum) {
             leftToRight = true;
         }
+        // 不是滑动停止状态 state != 0，滑动的时候控制的是离开状态
         if (mScrollState != ScrollState.SCROLL_STATE_IDLE) {
             if (currentPositionOffsetSum == mLastPositionOffsetSum) {
                 return;
             }
             int nextPosition = position + 1;
             boolean normalDispatch = true;
-            if (positionOffset == 0.0f) {
-                if (leftToRight) {
+            if (positionOffset == 0.0f) {//positionOffset==0.0 意味着滑动也停止了或者位置没变化
+                if (leftToRight) { // 如果往左滑动的，此时position已经是下一个位置了，nextPosition成了滑动前的那个位置
                     nextPosition = position - 1;
                     normalDispatch = false;
                 }
             }
+            // 分发离开状态，这里的分发控制的是非当前位置和下一个位置的其他位置
             for (int i = 0; i < mTotalCount; i++) {
+                // 如果是当前 位置 或者是 下一个位置，则跳过当前循环
                 if (i == position || i == nextPosition) {
                     continue;
                 }
@@ -49,8 +53,9 @@ public class NavigatorHelper {
                     dispatchOnLeave(i, 1.0f, leftToRight, true);
                 }
             }
+            // 正常分发
             if (normalDispatch) {
-                if (leftToRight) {
+                if (leftToRight) { // 往左滑动
                     dispatchOnLeave(position, positionOffset, true, false);
                     dispatchOnEnter(nextPosition, positionOffset, true, false);
                 } else {
@@ -61,21 +66,23 @@ public class NavigatorHelper {
                 dispatchOnLeave(nextPosition, 1.0f - positionOffset, true, false);
                 dispatchOnEnter(position, 1.0f - positionOffset, true, false);
             }
-        } else {
+        } else { // state == 0 , 滑动停止了， 其时的mCurrentIndextion 是滑动到的当前位置
             for (int i = 0; i < mTotalCount; i++) {
                 if (i == mCurrentIndex) {
                     continue;
                 }
                 boolean deselected = mDeselectedItems.get(i);
-                if (!deselected) {
+                if (!deselected) { //分发没有选择
                     dispatchOnDeselected(i);
                 }
                 Float leavedPercent = mLeavedPercents.get(i, 0.0f);
-                if (leavedPercent != 1.0f) {
+                if (leavedPercent != 1.0f) { // 分发离开 离开状态 为 1.0f
                     dispatchOnLeave(i, 1.0f, false, true);
                 }
             }
+            // 分发进入
             dispatchOnEnter(mCurrentIndex, 1.0f, false, true);
+            // 分发选择
             dispatchOnSelected(mCurrentIndex);
         }
         mLastPositionOffsetSum = currentPositionOffsetSum;

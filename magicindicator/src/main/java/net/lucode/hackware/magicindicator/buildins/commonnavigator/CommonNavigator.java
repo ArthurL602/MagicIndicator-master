@@ -2,7 +2,6 @@ package net.lucode.hackware.magicindicator.buildins.commonnavigator;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,7 +124,8 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
             root = LayoutInflater.from(getContext()).inflate(R.layout.pager_navigator_layout, this);
         }
 
-        mScrollView = (HorizontalScrollView) root.findViewById(R.id.scroll_view);   // mAdjustMode为true时，mScrollView为null
+        mScrollView = (HorizontalScrollView) root.findViewById(R.id.scroll_view);   //
+        // mAdjustMode为true时，mScrollView为null
         // title包裹者  父布局
         mTitleContainer = (LinearLayout) root.findViewById(R.id.title_container);
         mTitleContainer.setPadding(mLeftPadding, 0, mRightPadding, 0);
@@ -161,7 +161,8 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
             // 添加indicator
             mIndicator = mAdapter.getIndicator(getContext());
             if (mIndicator instanceof View) {
-                LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                LayoutParams lp = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams
+                        .MATCH_PARENT);
                 mIndicatorContainer.addView((View) mIndicator, lp);
             }
         }
@@ -221,24 +222,26 @@ public class CommonNavigator extends FrameLayout implements IPagerNavigator, Nav
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
         if (mAdapter != null) {
-
+            // 控制离开、选择、没有选择、进入集中状态
             mNavigatorHelper.onPageScrolled(position, positionOffset, positionOffsetPixels);
             if (mIndicator != null) {
+                // 绘制指示器
                 mIndicator.onPageScrolled(position, positionOffset, positionOffsetPixels);
             }
 
             // 手指跟随滚动
-            if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList.size()) {
+            if (mScrollView != null && mPositionDataList.size() > 0 && position >= 0 && position < mPositionDataList
+                    .size()) {
                 if (mFollowTouch) {
                     // 下面的计算让
                     int currentPosition = Math.min(mPositionDataList.size() - 1, position); // 计算当前下标
                     int nextPosition = Math.min(mPositionDataList.size() - 1, position + 1); // 计算下一个下标
                     PositionData current = mPositionDataList.get(currentPosition); // 取出当前title相关坐标数值
                     PositionData next = mPositionDataList.get(nextPosition); // 取出下一个title相关坐标数值
-
-                    float scrollTo = current.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;// 当前title下的ScrollView的ScrollX
-                    float nextScrollTo = next.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;// 目标title下的ScrollView的ScrollX
-                    Log.e("TAG", "scrollTo-->"+(int) (scrollTo + (nextScrollTo - scrollTo) * positionOffset));
+                    // 当前title的中心位置 - HorizontalScrollView的宽度的一半 ， 使其处于ScrollView中心位置
+                    float scrollTo = current.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
+                    // 下一个title的中心位置 - HorizontalScrollView的宽度的一半 ， 使其处于ScrollView中心位置
+                    float nextScrollTo = next.horizontalCenter() - mScrollView.getWidth() * mScrollPivotX;
                     // (int) (scrollTo + (nextScrollTo - scrollTo) * positionOffset) 这个指可能小于 0 可能大于子View的Width
                     // 但是HorizontalScrollView做了处理，这两中情况分别会等于 0 和 width
                     mScrollView.scrollTo((int) (scrollTo + (nextScrollTo - scrollTo) * positionOffset), 0);

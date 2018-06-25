@@ -84,28 +84,28 @@ public class LinePagerIndicator extends View implements IPagerIndicator {
         float nextLeftX;
         float rightX;
         float nextRightX;
-        if (mMode == MODE_MATCH_EDGE) {
+        if (mMode == MODE_MATCH_EDGE) { // 指示器充满title宽度
             leftX = current.mLeft + mXOffset;
             nextLeftX = next.mLeft + mXOffset;
             rightX = current.mRight - mXOffset;
             nextRightX = next.mRight - mXOffset;
-        } else if (mMode == MODE_WRAP_CONTENT) {
+        } else if (mMode == MODE_WRAP_CONTENT) { // 指示器包裹title内容的宽度
             leftX = current.mContentLeft + mXOffset;
             nextLeftX = next.mContentLeft + mXOffset;
             rightX = current.mContentRight - mXOffset;
             nextRightX = next.mContentRight - mXOffset;
-        } else {    // MODE_EXACTLY
+        } else {    // MODE_EXACTLY // 指定指示器精准的宽度
             leftX = current.mLeft + (current.width() - mLineWidth) / 2;
             nextLeftX = next.mLeft + (next.width() - mLineWidth) / 2;
             rightX = current.mLeft + (current.width() + mLineWidth) / 2;
             nextRightX = next.mLeft + (next.width() + mLineWidth) / 2;
         }
-
+        // 给指示器四个点赋值
         mLineRect.left = leftX + (nextLeftX - leftX) * mStartInterpolator.getInterpolation(positionOffset);
         mLineRect.right = rightX + (nextRightX - rightX) * mEndInterpolator.getInterpolation(positionOffset);
         mLineRect.top = getHeight() - mLineHeight - mYOffset;
         mLineRect.bottom = getHeight() - mYOffset;
-
+        // 绘制
         invalidate();
     }
 
